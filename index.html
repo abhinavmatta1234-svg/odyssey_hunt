@@ -516,7 +516,7 @@
   </div>
  
   <div class="submit-wrap">
-    <button class="submit-btn" onclick="handleSubmit()">Complete the Odyssey</button>
+    <button class="submit-btn" onclick="handleSubmit()">COMPLETE THE ODYSSEY</button>
   </div>
  
   <div class="footer">Odyssey of the Triads &bull; BMSCE IEEE CS</div>
@@ -533,8 +533,8 @@
 <script>
   async function handleSubmit() {
     // 1. Grab values from the inputs
-    const team = document.getElementById('team-name').value.tolower.trim();
-    const final = document.getElementById('final-answer').value.tolower.trim();
+    const team = document.getElementById('team-name').value.trim();
+    const final = document.getElementById('final-answer').value.trim();
 
     // 2. Simple check to make sure they didn't leave it blank
     if (!team || !final) {
