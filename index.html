@@ -531,48 +531,56 @@
 </div>
  
 <script>
- async function handleSubmit() {
+  <script>
+  // This function handles the logic when clicking "COMPLETE THE ODYSSEY"
+  async function handleSubmit() {
     const team = document.getElementById('team-name').value.trim();
     const final = document.getElementById('final-answer').value.trim();
 
     if (!team || !final) {
-        alert("Enter your Team Name and the Final Answer!");
-        return;
+      alert("Enter your Team Name and the Final Answer!");
+      return;
     }
 
     try {
-        const response = await fetch('/api/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                team: team, 
-                finalAnswer: final 
-            })
-        });
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          team: team, 
+          finalAnswer: final 
+        })
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.success) {
-            document.getElementById('modal-team').textContent = team;
-            document.getElementById('modal').classList.add('visible');
-        } else {
-            alert("The gates of Ithaca remain shut. That is not the word.");
-        }
+      if (data.success) {
+        document.getElementById('modal-team').textContent = team;
+        document.getElementById('modal').classList.add('visible');
+      } else {
+        alert("The gates of Ithaca remain shut. That is not the word.");
+      }
     } catch (err) {
-        console.error("Submission error:", err);
-        alert("The Odyssey encountered a technical storm. Please try again.");
+      console.error("Submission error:", err);
+      alert("The Odyssey encountered a technical storm. Please try again.");
     }
-}
+  }
 
-// === THE NEW FUNCTION ===
-function closeModal() {
-    // Hide the modal first
-    document.getElementById('modal').classList.remove('visible');
+  /** * THE FIX: This function must live outside of handleSubmit 
+   * so the button's onclick="closeModal()" can find it.
+   */
+  function closeModal() {
+    // 1. Hide the modal visually
+    const modal = document.getElementById('modal');
+    if (modal) {
+      modal.classList.remove('visible');
+    }
     
-    // Redirect to your thank you page
-    // Change "/thanks.html" to your actual URL or filename
+    // 2. Redirect to your thank you page
+    // Make sure 'thanks.html' exists in your GitHub repository!
     window.location.href = "/thanks.html"; 
-}
+  }
+</script>
 </script>
 </body>
 </html> 
