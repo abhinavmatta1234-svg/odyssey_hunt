@@ -531,19 +531,16 @@
 </div>
  
 <script>
-  async function handleSubmit() {
-    // 1. Grab values from the inputs
+ async function handleSubmit() {
     const team = document.getElementById('team-name').value.trim();
     const final = document.getElementById('final-answer').value.trim();
 
-    // 2. Simple check to make sure they didn't leave it blank
     if (!team || !final) {
         alert("Enter your Team Name and the Final Answer!");
         return;
     }
 
     try {
-        // 3. The FETCH call: This sends a POST request to your Vercel API
         const response = await fetch('/api/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -553,23 +550,29 @@
             })
         });
 
-        // 4. Parse the JSON response from the server
         const data = await response.json();
 
         if (data.success) {
-            // 5. SUCCESS: If the backend says "success: true", show the modal
             document.getElementById('modal-team').textContent = team;
             document.getElementById('modal').classList.add('visible');
         } else {
-            // 6. FAILURE: If the backend says "success: false", the answer was wrong
             alert("The gates of Ithaca remain shut. That is not the word.");
         }
     } catch (err) {
-        // 7. ERROR: If the server is down or the internet fails
         console.error("Submission error:", err);
         alert("The Odyssey encountered a technical storm. Please try again.");
     }
 }
+
+// === THE NEW FUNCTION ===
+function closeModal() {
+    // Hide the modal first
+    document.getElementById('modal').classList.remove('visible');
+    
+    // Redirect to your thank you page
+    // Change "/thanks.html" to your actual URL or filename
+    window.location.href = "/thanks.html"; 
+}
 </script>
 </body>
-</html>
+</html> 
