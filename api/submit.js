@@ -10,13 +10,22 @@ export default async function handler(req, res) {
   const { team, finalAnswer } = req.body;
 
   // 1. The Secret Check
-  const isCorrect = finalAnswer.toLowerCase().trim() === 'heyo';
+  const isCorrect = finalAnswer && finalAnswer.toLowerCase().trim() === 'heyo';
 
   try {
-    // 2. Authenticate with Google
+    // 2. Safety Guard for the Private Key
+    const rawKey = process.env.GOOGLE_PRIVATE_KEY;
+    if (!rawKey) {
+        throw new Error("GOOGLE_PRIVATE_KEY is missing from Vercel Environment Variables");
+    }
+
+    // This is the "Magic Fix" for the DECODER error
+    const formattedKey = rawKey.replace(/\\n/g, '\n');
+
+    // 3. Authenticate with Google
     const serviceAccountAuth = new JWT({
       email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      key: formattedKey,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
 
@@ -24,22 +33,26 @@ export default async function handler(req, res) {
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[0];
 
-    // 3. Append the data to Google Sheets
+    // 4. Append the data to Google Sheets
     await sheet.addRow({
       'Timestamp': new Date().toLocaleString(),
-      'Team Name': team,
-      'Final Answer': finalAnswer,
+      'Team Name': team || 'Unknown Team',
+      'Final Answer': finalAnswer || 'No Answer',
       'Status': isCorrect ? 'SUCCESS' : 'WRONG'
     });
 
-    // 4. Send response back to the website
-    if (isCorrect) {
-      return res.status(200).json({ success: true, message: "Victory! You have reached Ithaca." });
-    } else {
-      return res.status(200).json({ success: false, message: "Incorrect answer." });
-    }
+    // 5. Send response back to the website
+    return res.status(200).json({ 
+        success: isCorrect, 
+        message: isCorrect ? "Victory! You have reached Ithaca." : "Incorrect answer." 
+    });
+
   } catch (error) {
-    console.error('Error:', error);
-    return res.status(500).json({ success: false, message: "Database Error" });
+    console.error('SERVER ERROR:', error.message);
+    return res.status(500).json({ 
+        success: false, 
+        message: "The Oracle is silent (Database Error).",
+        error: error.message // This helps you see the error in the browser console
+    });
   }
 }
