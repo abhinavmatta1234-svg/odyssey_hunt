@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     }
 
     // This is the "Magic Fix" for the DECODER error
-    const formattedKey = rawKey.replace(/\\n/g, '\n');
+    const formattedKey = rawKey;
 
     // 3. Authenticate with Google
     const serviceAccountAuth = new JWT({
