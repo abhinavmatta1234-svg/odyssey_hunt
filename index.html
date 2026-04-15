@@ -532,15 +532,23 @@
 </div>
  
 <script>
-  // This function handles the logic when clicking "COMPLETE THE ODYSSEY"
   async function handleSubmit() {
+    const btn = document.querySelector('.submit-btn');
     const team = document.getElementById('team-name').value.trim();
     const final = document.getElementById('final-answer').value.trim();
 
+    // 1. Validation check before disabling
     if (!team || !final) {
       alert("Enter your Team Name and the Final Answer!");
       return;
     }
+
+    // 2. Disable button and provide feedback
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = "CLAIMING VICTORY...";
+    btn.style.opacity = "0.6";
+    btn.style.cursor = "not-allowed";
 
     try {
       const response = await fetch('/api/submit', {
@@ -559,25 +567,29 @@
         document.getElementById('modal').classList.add('visible');
       } else {
         alert("The gates of Ithaca remain shut. That is not the word.");
+        // 3. Re-enable button if the answer was wrong so they can try again
+        btn.disabled = false;
+        btn.textContent = originalText;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
       }
     } catch (err) {
       console.error("Submission error:", err);
       alert("The Odyssey encountered a technical storm. Please try again.");
+      
+      // Re-enable on technical error
+      btn.disabled = false;
+      btn.textContent = originalText;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     }
   }
 
-  /** * THE FIX: This function must live outside of handleSubmit 
-   * so the button's onclick="closeModal()" can find it.
-   */
   function closeModal() {
-    // 1. Hide the modal visually
     const modal = document.getElementById('modal');
     if (modal) {
       modal.classList.remove('visible');
     }
-    
-    // 2. Redirect to your thank you page
-    // Make sure 'thanks.html' exists in your GitHub repository!
     window.location.href = "/thanks.html"; 
   }
 </script>
