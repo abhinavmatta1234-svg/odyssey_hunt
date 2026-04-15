@@ -1,16 +1,226 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>The Journey Ends</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Journey Ends | Odyssey of the Triads</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { background: #0f051d; color: #ffd700; text-align: center; font-family: 'Garamond', serif; padding-top: 100px; }
-        h1 { font-size: 3rem; text-shadow: 0 0 10px #ff00ff; }
-        p { font-size: 1.5rem; color: #b19cd9; }
+        :root {
+            --gold: #ffd700;
+            --gold-glow: rgba(255, 215, 0, 0.4);
+            --purple-glow: #ff00ff;
+            --deep-space: #0a0612;
+            --teal: #22d3ee;
+        }
+
+        body { 
+            background-color: var(--deep-space); 
+            color: var(--gold); 
+            text-align: center; 
+            font-family: 'Crimson Pro', serif; 
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents scrollbars during celebration */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* === LIVE NEBULA BACKGROUND (REPLICATING YOUR IMAGE) === */
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #2d1854, #0a0612);
+        }
+
+        .nebula-swirl {
+            position: absolute;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 40% 40%, rgba(123, 63, 228, 0.5), transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(74, 31, 140, 0.4), transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.3), transparent 50%);
+            filter: url(#nebulaFilter);
+            animation: slow-rotate 60s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes slow-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* === CRACKERS CANVAS === */
+        canvas#crackers {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* === THE IMAGE CONTAINER === */
+        .image-frame {
+            position: relative;
+            margin: 20px auto;
+            max-width: 700px;
+            width: 85%;
+            z-index: 5;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .odyssey-image {
+            width: 100%;
+            height: auto;
+            border-radius: 60px;
+            /* Creates the blurry edge blending into the background */
+            mask-image: radial-gradient(circle, black 55%, rgba(0, 0, 0, 0.4) 80%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle, black 55%, rgba(0, 0, 0, 0.4) 80%, transparent 100%);
+            filter: drop-shadow(0 0 30px var(--purple-glow));
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        /* === TYPOGRAPHY === */
+        .content {
+            position: relative;
+            z-index: 20;
+            padding: 20px;
+        }
+
+        h1 { 
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.8rem, 6vw, 3.5rem); 
+            text-shadow: 0 0 20px var(--purple-glow), 0 0 40px rgba(255, 0, 255, 0.5);
+            letter-spacing: 8px;
+            margin: 0;
+            animation: text-pulse 3s ease-in-out infinite alternate;
+        }
+
+        p { 
+            font-size: 1.3rem; 
+            color: #b19cd9; 
+            letter-spacing: 2px;
+            margin-top: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes text-pulse { from { opacity: 0.8; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
     </style>
 </head>
 <body>
-    <h1>YOU HAVE REACHED ITHACA</h1>
-    <p>Your name has been etched into the scrolls of history.</p>
-    <p>Thank you for playing the Odyssey Treasure Hunt!</p>
+
+    <div class="bg-canvas">
+        <div class="nebula-swirl"></div>
+    </div>
+
+    <svg style="display: none;">
+        <filter id="nebulaFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="2" />
+            <feDisplacementMap in="SourceGraphic" scale="100" />
+        </filter>
+    </svg>
+
+    <canvas id="crackers"></canvas>
+
+    <div class="content">
+        <h1>YOU HAVE REACHED ITHACA</h1>
+        
+        <div class="image-frame">
+            <img src="final.png" alt="Victory at Ithaca" class="odyssey-image">
+        </div>
+
+        <p>Your name has been etched into the scrolls of history.</p>
+        <p style="font-size: 1rem; opacity: 0.8; margin-top: 20px;">TREASURE HUNT COMPLETED • 2026</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('crackers');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 12,
+                    y: (Math.random() - 0.5) * 12
+                };
+                this.alpha = 1;
+                this.friction = 0.96;
+                this.gravity = 0.15;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.random() * 3, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.012;
+            }
+        }
+
+        function launchCracker() {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * (canvas.height * 0.6);
+            const colors = ['#ffd700', '#ff00ff', '#22d3ee', '#ffffff', '#ffae00'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animate() {
+            // Slight transparency on redraw creates the "tail" or "afterglow" of the cracker
+            ctx.fillStyle = 'rgba(10, 6, 18, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p, i) => {
+                if (p.alpha > 0) {
+                    p.update();
+                    p.draw();
+                } else {
+                    particles.splice(i, 1);
+                }
+            });
+
+            if (Math.random() < 0.06) launchCracker();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
 </body>
 </html>
