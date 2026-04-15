@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const { team, finalAnswer } = req.body;
 
   // 1. The Secret Check
-  const isCorrect = finalAnswer && finalAnswer.toLowerCase().trim() === 'heyo';
+  const isCorrect = finalAnswer && finalAnswer.toLowerCase().trim() === 'trayanova';
 
   try {
     // 2. Safety Guard for the Private Key
